@@ -75,6 +75,8 @@ test('Node-RED editor exposes per-LED fields without JSON editing', async ({ pag
     await expect(page.locator('.bit-led-layout-options')).toHaveCount(0)
     await page.evaluate(() => RED.editor.edit(RED.nodes.node('led-uint32')))
     await expect(page.getByRole('radio', { name: 'Label left, LED right', exact: true })).toBeChecked()
+    await expect(page.locator('.bit-led-layout-options label').first()).toHaveCSS('display', 'flex')
+    await expect(page.locator('.bit-led-layout-options b').first()).toHaveCSS('width', '18px')
     await page.locator('.bit-led-layout-options').screenshot({ path: 'test-results/layout-picker.png' })
 })
 

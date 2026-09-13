@@ -82,11 +82,11 @@
     .bit-led-editor-row label { display: block; width: auto !important; font-size: 12px; }
     .bit-led-editor-row input[type=text], .bit-led-editor-row select { display: block; width: 100%; }
     .bit-led-layout-options { display: inline-grid; grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 12px; width: 70%; }
-    .bit-led-layout-options label { position: relative; display: flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; width: auto !important; min-height: 80px; padding: 12px; border: 1px solid var(--red-ui-form-input-border-color, #aaa); border-radius: 4px; cursor: pointer; }
-    .bit-led-layout-options label:has(input:checked) { border: 2px solid var(--red-ui-form-input-border-selected-color, #00897b); }
+    #dialog-form .bit-led-layout-options label { position: relative; display: flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; width: auto !important; min-height: 80px; padding: 12px; border: 1px solid var(--red-ui-form-input-border-color, #aaa); border-radius: 4px; cursor: pointer; }
+    #dialog-form .bit-led-layout-options label:has(input:checked) { border: 2px solid var(--red-ui-form-input-border-selected-color, #00897b); }
     .bit-led-layout-options input { position: absolute; right: 4px; top: 4px; width: auto !important; margin: 0; }
-    .bit-led-layout-options .bit-led-layout-spread { justify-content: space-between; }
-    .bit-led-layout-options b { width: 18px; height: 18px; border-radius: 50%; background: #00c853; flex-shrink: 0; }
+    #dialog-form .bit-led-layout-options .bit-led-layout-spread { justify-content: space-between; }
+    .bit-led-layout-options b { display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: #00c853; flex-shrink: 0; }
 </style>
 <script type="text/html" data-template-name="ui-bit-led">
     <div class="form-row"><label for="node-input-name">Name</label><input id="node-input-name" type="text"></div>

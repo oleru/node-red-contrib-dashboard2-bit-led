@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-beta.4 — 2026-09-13
+
+- Keep the visual layout picker correctly aligned under Node-RED editor styles.
+- First downloadable release of the layout/color/glow update; beta.3 is a development tag.
+
 ## 0.1.0-beta.3 — 2026-09-13
 
 - Add a visual four-option label/LED layout picker: label before/after the LED, together or at opposite edges of each cell.
