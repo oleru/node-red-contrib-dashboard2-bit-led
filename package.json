@@ -1,6 +1,6 @@
 {
   "name": "node-red-dashboard-2-bit-led",
-  "version": "0.1.0-beta.5",
+  "version": "0.1.0",
   "description": "Compact boolean and unsigned bitfield LED indicators for FlowFuse Dashboard 2",
   "license": "MIT",
   "repository": {

@@ -130,8 +130,48 @@
     <div id="bit-led-indicators"></div>
 </script>
 <script type="text/html" data-help-name="ui-bit-led">
-    <p>Displays 1, 8, 16 or 32 status LEDs on FlowFuse Dashboard 2. One input, no outputs.</p>
-    <p>Send the explicitly selected type in <code>msg.payload</code>. Unsigned integers must be within their bit width; bit 0 is the least significant bit. Boolean requires one LED. Arrays require exactly the LED count and boolean entries. Named objects require every configured literal key to contain a boolean; extra keys are ignored. Disabled sources are still validated.</p>
+    <p>Displays boolean signals as LEDs on FlowFuse Dashboard 2. Configure 1, 8, 16 or 32 indicator slots and use Hidden to display any subset. One input, no outputs.</p>
+    <h3>Sending data</h3>
+    <p>Select <b>Input type</b> in the editor first. The node reads <code>msg.payload</code>; it does not guess the type or convert strings to numbers/booleans. The examples below assume normal (not inverted) logic.</p>
+    <p>With an <b>Inject</b> node, set its payload type to boolean, number or JSON as indicated below and enter only the payload value. With a <b>Function</b> node, return a message containing the payload, for example:</p>
+    <pre>msg.payload = 129;
+return msg;</pre>
+    <p>For that example, select UInt8: bits 0 and 7 are On. Do not send the JSON string <code>"129"</code> or place another <code>payload</code> object inside <code>msg.payload</code>.</p>
+    <h3>Boolean — one signal</h3>
+    <p>Select <b>Boolean</b> and LED count <b>1</b>. Inject payload type: <b>boolean</b>.</p>
+    <pre>true</pre>
+    <p><code>true</code> turns the LED On; <code>false</code> turns it Off. Numbers <code>1</code>/<code>0</code> and strings <code>"true"</code>/<code>"false"</code> are not booleans and are rejected.</p>
+    <h3>UInt8 / UInt16 / UInt32 — one number containing several bits</h3>
+    <p>Inject payload type: <b>number</b>. Send a whole unsigned integer within the selected range:</p>
+    <ul>
+        <li><b>UInt8:</b> 0–255. Example <code>129</code> = bits 0 and 7 On; other bits Off.</li>
+        <li><b>UInt16:</b> 0–65535. Example <code>32769</code> = bits 0 and 15 On.</li>
+        <li><b>UInt32:</b> 0–4294967295. Example <code>2147483649</code> = bits 0 and 31 On.</li>
+    </ul>
+    <p>Bit numbers start at <b>0</b>: bit 0 has value 1, bit 1 has value 2, bit 2 has value 4, and so on. Add their values to set several bits: <code>5 = 1 + 4</code> turns bits 0 and 2 On. <code>0</code> turns all bits Off; <code>255</code> turns all 8 bits On for UInt8.</p>
+    <p>The per-LED <b>Bit / index</b> field selects which bit to display. It does not need to match the LED's position. UInt32 bit 31 is unsigned: send <code>2147483648</code>, not <code>-2147483648</code>. Negative numbers, fractions and values above the selected maximum are rejected.</p>
+    <h3>Boolean array — one boolean per index</h3>
+    <p>Select <b>Boolean array</b> and LED count <b>8</b> for this example. Inject payload type: <b>JSON</b>.</p>
+    <pre>[true, false, true, false, false, false, false, true]</pre>
+    <p>With default source mappings, LEDs for indices 0, 2 and 7 are On. Indices start at 0; set each LED's <b>Bit / index</b> to the required array index.</p>
+    <p>The array must contain exactly the configured slot count (1, 8, 16 or 32), and every entry must be a boolean. <code>[1, 0, 1]</code> and arrays of objects are not supported. Hidden LEDs do not shorten the required array: an 8-slot node with 3 hidden LEDs still requires 8 values.</p>
+    <h3>Named object — map signals by key</h3>
+    <p>Select <b>Named object</b>. For one LED, choose count <b>1</b> and set its <b>Input key</b> to <code>MotorRunning</code>. Inject payload type: <b>JSON</b>.</p>
+    <pre>{ "MotorRunning": true }</pre>
+    <p>For 8 LEDs, configure one Input key per LED and send all eight boolean properties, for example:</p>
+    <pre>{
+  "MotorRunning": true,
+  "Ready": true,
+  "Blocked": false,
+  "Fault": false,
+  "Remote": true,
+  "Manual": false,
+  "Warning": false,
+  "Connected": true
+}</pre>
+    <p>Keys are case-sensitive. Configure the Input keys to match these names; changing the visible Label alone does not change the input mapping. Every configured key must exist and contain <code>true</code> or <code>false</code>. Extra keys are ignored. Keys are literal: <code>motor.ready</code> means a property named exactly that, not a nested object path.</p>
+    <h3>Invalid input and retained state</h3>
+    <p><code>null</code>, missing payloads, wrong types, missing object keys or wrong array lengths are rejected. Hidden and disabled sources are still validated. One invalid source rejects the whole update, retaining all LEDs at their last valid state.</p>
     <p>Individual logic and colors override shared defaults. Invalid input retains the last valid display and sets red node status. Warnings are limited to one per five seconds. Refresh/reconnect restores the last valid value while Node-RED is running.</p>
     <p>Label / LED layout places the label before or after the LED, either together or at opposite edges of each indicator cell. LED arrangement controls the grid/column/row separately. Default colors are green (#00c853) for active and green-grey (#a8b5ac) for inactive; custom colors and CSS variables override these.</p>
     <p>Hidden removes an indicator and its label from the layout, including its space. Use an 8-slot input with three hidden indicators to show five LEDs. Sources are not renumbered. Input validation remains unchanged: full array length and all configured object keys are still required. Hidden and Enabled are independent; unhide retains the previous Enabled setting. All indicators may be hidden. Visibility is configured in the editor and applied on redeploy.</p>

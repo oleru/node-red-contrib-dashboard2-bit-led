@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0 — 2026-09-13
+
+- First regular release, carrying forward the tested beta.5 functionality.
+- Expand the built-in node help with copyable payload examples for every input type, Inject/Function guidance, unsigned bit numbering, source mapping and common validation mistakes.
+- Clarify full input requirements for hidden/disabled indicators and retained state after invalid input.
+- No runtime behavior changes from beta.5. Target-device long-duration measurements remain pending.
+
 ## 0.1.0-beta.5 — 2026-09-13
 
 - Add Hidden per indicator, independent of Enabled. Hidden LEDs and labels occupy no cells and receive no paint operations.

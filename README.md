@@ -2,7 +2,7 @@
 
 One Node-RED input displays 1, 8, 16 or 32 boolean signals in a FlowFuse Dashboard 2 widget. This is a read-only status display with no outputs, control commands or device-specific logic.
 
-**Prerelease: 0.1.0-beta.5.** Target-device performance acceptance remains pending.
+**Release: 0.1.0.** Tested automatically on Windows and Linux. Long-duration target-device performance measurements remain pending; see docs/VALIDATION.md.
 
 The GitHub repository is `oleru/node-red-contrib-dashboard2-bit-led`; the installable package is **`node-red-dashboard-2-bit-led`**. Dashboard 1.31 discovers third-party packages by the `node-red-dashboard-2-` name fragment, so the suggested repository name cannot also be the package name.
 
@@ -10,11 +10,11 @@ The GitHub repository is `oleru/node-red-contrib-dashboard2-bit-led`; the instal
 
 Requires Node.js **22.12+**, Node-RED **4+** and `@flowfuse/node-red-dashboard` **1.31.x**. Dashboard 1 is not supported. The package is not yet published to npm.
 
-Download the `.tgz` from the GitHub prerelease, then run in your Node-RED user directory:
+Download the `.tgz` from the GitHub release, then run in your Node-RED user directory:
 
 ```sh
 npm install @flowfuse/node-red-dashboard@1.31.0
-npm install /path/to/node-red-dashboard-2-bit-led-0.1.0-beta.5.tgz
+npm install /path/to/node-red-dashboard-2-bit-led-0.1.0.tgz
 ```
 
 Restart Node-RED. Add **bit LEDs** from the dashboard palette, choose a Dashboard 2 group and explicitly select the input type. Import `examples/dashboard2-bit-led-flow.json` for examples of all input types. Inject nodes do not run automatically.
@@ -22,7 +22,7 @@ Restart Node-RED. Add **bit LEDs** from the dashboard palette, choose a Dashboar
 For installation from a versioned Git tag (requires the development build dependencies during installation):
 
 ```sh
-npm install github:oleru/node-red-contrib-dashboard2-bit-led#v0.1.0-beta.5
+npm install github:oleru/node-red-contrib-dashboard2-bit-led#v0.1.0
 ```
 
 The tarball includes the compiled browser bundle; no build is needed on the target machine. Keep the tarball available for reproducible installation or use the exact tag. Do not track a moving development branch.
