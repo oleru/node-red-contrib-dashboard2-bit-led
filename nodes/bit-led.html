@@ -16,6 +16,7 @@
         },
         oneditprepare: function () {
             const node = this
+            let previousInputType = node.inputType || 'uint8'
             $('#node-input-labelLayout').val(node.labelLayout || 'led-label')
             $('input[name="bit-led-label-layout"]').val([node.labelLayout || 'led-label']).on('change', function () {
                 $('#node-input-labelLayout').val(this.value)
@@ -28,6 +29,7 @@
                     rows[i] = {
                         source: $('#node-input-inputType').val() === 'object' ? row.find('.led-source').val() : Number(row.find('.led-source').val()),
                         label: row.find('.led-label').val(), enabled: row.find('.led-enabled').prop('checked'),
+                        hidden: row.find('.led-hidden').prop('checked'),
                         inverted: inverted === 'inherit' ? null : inverted === 'true',
                         activeColor: row.find('.led-activeColor').val(), passiveColor: row.find('.led-passiveColor').val(),
                         icon: row.find('.led-icon').val()
@@ -54,15 +56,27 @@
                         .val(typeof item.inverted === 'boolean' ? String(item.inverted) : 'inherit').appendTo(logicLabel)
                     const enabled = $('<label>').text('Enabled ').appendTo(row)
                     $('<input type="checkbox" class="led-enabled">').prop('checked', item.enabled !== false).appendTo(enabled)
+                    const hidden = $('<label>').text('Hidden (no space in layout) ').appendTo(row)
+                    $('<input type="checkbox" class="led-hidden">').prop('checked', item.hidden === true).on('change', updateVisibleCount).appendTo(hidden)
                     field('activeColor', 'Active color (blank = default)', item.activeColor || '')
                     field('passiveColor', 'Inactive color (blank = default)', item.passiveColor || '')
                     field('icon', 'Optional MDI icon, e.g. mdi-alert', item.icon || '')
                 }
+                updateVisibleCount()
+            }
+            function updateVisibleCount () {
+                const total = $('#bit-led-indicators .led-hidden').length
+                const hidden = $('#bit-led-indicators .led-hidden:checked').length
+                $('#bit-led-visible-count').text((total - hidden) + ' of ' + total + ' LEDs visible')
             }
             $('#node-input-count').on('change.bitLed', function () { readRows(); renderRows() })
             $('#node-input-inputType').on('change.bitLed', function () {
-                readRows()
                 const type = $(this).val()
+                // Node-RED emits change while initializing the dialog too.
+                // Only an actual type change should reset count/source mappings.
+                if (type === previousInputType) return
+                previousInputType = type
+                readRows()
                 const suggested = { boolean: 1, uint8: 8, uint16: 16, uint32: 32 }
                 if (suggested[type]) $('#node-input-count').val(String(suggested[type]))
                 rows.forEach(function (row, i) { row.source = type === 'object' ? 'bit' + i : i })
@@ -111,7 +125,8 @@
     <div class="form-row"><label for="node-input-passiveColor">Inactive color</label><input id="node-input-passiveColor" placeholder="#a8b5ac — green-grey"></div>
     <div class="form-row"><label for="node-input-disabledColor">Disabled color</label><input id="node-input-disabledColor" placeholder="Theme foreground, 12%"></div>
     <div class="form-row"><label for="node-input-diagnostics">Diagnostics</label><input id="node-input-diagnostics" type="checkbox" style="width:auto"></div>
-    <p>Colors accept CSS colors and CSS variables. Blank values inherit defaults. Disabled LEDs remain visible.</p>
+    <p>Colors accept CSS colors and CSS variables. Blank values inherit defaults. Disabled LEDs remain visible; Hidden LEDs are omitted without changing source mappings or input length. Redeploy to apply.</p>
+    <p id="bit-led-visible-count" aria-live="polite"></p>
     <div id="bit-led-indicators"></div>
 </script>
 <script type="text/html" data-help-name="ui-bit-led">
@@ -119,5 +134,6 @@
     <p>Send the explicitly selected type in <code>msg.payload</code>. Unsigned integers must be within their bit width; bit 0 is the least significant bit. Boolean requires one LED. Arrays require exactly the LED count and boolean entries. Named objects require every configured literal key to contain a boolean; extra keys are ignored. Disabled sources are still validated.</p>
     <p>Individual logic and colors override shared defaults. Invalid input retains the last valid display and sets red node status. Warnings are limited to one per five seconds. Refresh/reconnect restores the last valid value while Node-RED is running.</p>
     <p>Label / LED layout places the label before or after the LED, either together or at opposite edges of each indicator cell. LED arrangement controls the grid/column/row separately. Default colors are green (#00c853) for active and green-grey (#a8b5ac) for inactive; custom colors and CSS variables override these.</p>
+    <p>Hidden removes an indicator and its label from the layout, including its space. Use an 8-slot input with three hidden indicators to show five LEDs. Sources are not renumbered. Input validation remains unchanged: full array length and all configured object keys are still required. Hidden and Enabled are independent; unhide retains the previous Enabled setting. All indicators may be hidden. Visibility is configured in the editor and applied on redeploy.</p>
     <p>Changing input type resets source mappings; labels and overrides remain. Redeploy after configuration changes. Diagnostics show session totals and average browser rates; rejected payload counts are reported by the runtime warning.</p>
 </script>

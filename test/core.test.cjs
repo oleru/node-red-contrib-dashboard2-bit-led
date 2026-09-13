@@ -2,6 +2,18 @@ const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const { configure, validate, decode, color } = require('../lib/core.cjs')
 
+test('hidden defaults off, is independent of enabled and keeps the input contract', () => {
+    assert.equal(configure({}).indicators[0].hidden, false)
+    const array = configure({ inputType: 'array', count: 8, indicators: [{ hidden: true, enabled: false }] })
+    assert.equal(array.indicators[0].hidden, true)
+    assert.equal(array.indicators[0].enabled, false)
+    assert.equal(validate(Array(8).fill(true), array), null)
+    assert.ok(validate(Array(7).fill(true), array))
+    const object = configure({ inputType: 'object', count: 1, indicators: [{ source: 'hidden', hidden: true }] })
+    assert.ok(validate({}, object))
+    assert.equal(validate({ hidden: false }, object), null)
+})
+
 for (const [inputType, count] of [['uint8', 8], ['uint16', 16], ['uint32', 32]]) {
     const config = configure({ inputType, count })
     test(`${inputType}: unsigned limits and bit positions`, () => {

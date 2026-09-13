@@ -33,6 +33,9 @@ server.listen(18890, '127.0.0.1', async () => {
     for (const labelLayout of ['label-led', 'led-label', 'label-led-spread', 'led-label-spread']) {
         flow.push({ id: 'layout-' + labelLayout, type: 'ui-bit-led', z: 'led-flow', x: 750, y: 100, name: labelLayout, group: 'led-group', inputType: 'boolean', count: 1, width: 6, height: 0, layout: 'column', labelLayout, indicators: [{ label: 'Signal' }], wires: [] })
     }
+    flow.push({ id: 'hidden-bits', type: 'ui-bit-led', z: 'led-flow', x: 750, y: 200, name: 'Hidden bits', group: 'led-group', inputType: 'uint32', count: 32, width: 12, height: 0, layout: 'grid', columns: 4,
+        indicators: Array.from({ length: 32 }, (_, source) => ({ source, label: 'Signal ' + source, hidden: ![0, 4, 7, 15, 31].includes(source), enabled: source !== 4 })), wires: [] })
+    flow.push({ id: 'all-hidden', type: 'ui-bit-led', z: 'led-flow', x: 750, y: 240, name: 'All hidden', group: 'led-group', inputType: 'boolean', count: 1, width: 6, height: 0, indicators: [{ hidden: true }], wires: [] })
     await RED.nodes.setFlows(flow, 'full')
 })
 async function close () { await RED.stop(); server.close(); process.exit(0) }

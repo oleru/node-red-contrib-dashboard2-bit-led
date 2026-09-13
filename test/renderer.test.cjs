@@ -2,6 +2,18 @@ const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const { configure } = require('../lib/core.cjs')
 
+test('hidden indicators are never painted or counted as changes', async () => {
+    const { createRenderer } = await import('../ui/renderer.mjs')
+    let callback
+    const painted = []
+    const config = configure({ inputType: 'uint8', count: 8, indicators: Array.from({ length: 8 }, (_, source) => ({ source, hidden: source !== 7 })) })
+    const renderer = createRenderer(config, (...args) => painted.push(args), () => {}, { requestAnimationFrame: fn => { callback = fn; return 1 } })
+    renderer.receive(128); callback()
+    assert.deepEqual(painted.map(([index, state]) => [index, state]), [[7, true]])
+    renderer.receive(129); callback()
+    assert.equal(painted.length, 1)
+})
+
 test('one pending frame, changed LEDs only, invalid retains last, cleanup', async () => {
     const { createRenderer } = await import('../ui/renderer.mjs')
     let callback, scheduled = 0, cancelled = 0

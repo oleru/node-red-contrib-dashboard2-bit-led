@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-beta.5 — 2026-09-13
+
+- Add Hidden per indicator, independent of Enabled. Hidden LEDs and labels occupy no cells and receive no paint operations.
+- Show any subset of configured indicators while preserving original source indices/keys and the input contract.
+- Display visible/total LED counts in the editor and node status.
+- Preserve hidden settings across editor saves and refresh; existing flows remain visible by default.
+- Keep saved indicator count/source mappings when reopening the editor; reset them only on an actual input-type change.
+
 ## 0.1.0-beta.4 — 2026-09-13
 
 - Keep the visual layout picker correctly aligned under Node-RED editor styles.

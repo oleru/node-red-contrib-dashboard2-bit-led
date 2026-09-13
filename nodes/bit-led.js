@@ -15,7 +15,8 @@ module.exports = function (RED) {
             node.error(error.message)
             return
         }
-        const normal = `${settings.inputType} · ${settings.count} LEDs`
+        const visible = settings.indicators.filter(item => !item.hidden).length
+        const normal = `${settings.inputType} · ${visible === settings.count ? visible : `${visible}/${settings.count}`} LEDs`
         let statusText
         let lastWarning = -Infinity
         let invalid = 0

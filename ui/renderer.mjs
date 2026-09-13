@@ -21,6 +21,7 @@ export function createRenderer (config, paint, report = () => {}, scheduler = gl
                 frame = null
                 if (stats) stats.renders++
                 for (let i = 0; i < config.count; i++) {
+                    if (config.indicators[i].hidden) continue
                     const state = core.decode(pending, config, i)
                     if (state !== states[i]) {
                         states[i] = state

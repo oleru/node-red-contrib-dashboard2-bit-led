@@ -1,12 +1,14 @@
 <template>
     <div class="bit-led-widget">
         <div class="bit-led-list" :class="'bit-led-' + config.layout" :style="{ '--bit-led-columns': config.columns }" role="list" :aria-label="props.name || 'Bit indicators'">
-            <div v-for="(item, index) in config.indicators" :key="index" class="bit-led-item" :class="['bit-led-position-' + config.labelLayout, { 'bit-led-disabled': !item.enabled }]" role="listitem">
+            <template v-for="(item, index) in config.indicators" :key="index">
+            <div v-if="!item.hidden" class="bit-led-item" :class="['bit-led-position-' + config.labelLayout, { 'bit-led-disabled': !item.enabled }]" role="listitem">
                 <span :ref="element => lamps[index] = element" class="bit-led-lamp" :class="{ 'bit-led-round': !item.icon }" :style="{ color: item.disabledColor, backgroundColor: item.icon ? 'transparent' : item.disabledColor }" role="img" :aria-label="item.label + ': ' + (item.enabled ? 'Waiting for data' : 'Disabled')">
                     <v-icon v-if="item.icon" :icon="item.icon" size="20" />
                 </span>
                 <span class="bit-led-label">{{ item.label }}</span>
             </div>
+            </template>
         </div>
         <output v-if="config.diagnostics" ref="diagnostics" class="bit-led-diagnostics" />
     </div>

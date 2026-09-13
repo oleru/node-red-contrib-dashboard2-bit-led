@@ -2,7 +2,7 @@
 
 One Node-RED input displays 1, 8, 16 or 32 boolean signals in a FlowFuse Dashboard 2 widget. This is a read-only status display with no outputs, control commands or device-specific logic.
 
-**Prerelease: 0.1.0-beta.4.** Target-device performance acceptance remains pending.
+**Prerelease: 0.1.0-beta.5.** Target-device performance acceptance remains pending.
 
 The GitHub repository is `oleru/node-red-contrib-dashboard2-bit-led`; the installable package is **`node-red-dashboard-2-bit-led`**. Dashboard 1.31 discovers third-party packages by the `node-red-dashboard-2-` name fragment, so the suggested repository name cannot also be the package name.
 
@@ -14,7 +14,7 @@ Download the `.tgz` from the GitHub prerelease, then run in your Node-RED user d
 
 ```sh
 npm install @flowfuse/node-red-dashboard@1.31.0
-npm install /path/to/node-red-dashboard-2-bit-led-0.1.0-beta.4.tgz
+npm install /path/to/node-red-dashboard-2-bit-led-0.1.0-beta.5.tgz
 ```
 
 Restart Node-RED. Add **bit LEDs** from the dashboard palette, choose a Dashboard 2 group and explicitly select the input type. Import `examples/dashboard2-bit-led-flow.json` for examples of all input types. Inject nodes do not run automatically.
@@ -22,7 +22,7 @@ Restart Node-RED. Add **bit LEDs** from the dashboard palette, choose a Dashboar
 For installation from a versioned Git tag (requires the development build dependencies during installation):
 
 ```sh
-npm install github:oleru/node-red-contrib-dashboard2-bit-led#v0.1.0-beta.4
+npm install github:oleru/node-red-contrib-dashboard2-bit-led#v0.1.0-beta.5
 ```
 
 The tarball includes the compiled browser bundle; no build is needed on the target machine. Keep the tarball available for reproducible installation or use the exact tag. Do not track a moving development branch.
@@ -47,6 +47,10 @@ Invalid input retains the latest valid value, sets red Node-RED status and logs 
 ## Configuration
 
 Each LED has a source, label, enabled flag, inherited/normal/inverted logic, optional active/inactive colors and optional Material Design icon (e.g. `mdi-alert`). Per-LED choices override shared defaults. Disabled means visible and dimmed, independent of the payload. Inversion happens before active/inactive color selection.
+
+**Hidden** is a separate checkbox per LED. It removes that LED and its label from the rendered layout without leaving an empty cell. For example, configure 8 slots and hide 3 to display 5 LEDs, or hide unused sources in a 32-bit word to show any subset including bit 31. The editor shows the visible count; node status shows visible/total when some are hidden. Existing flows default to all indicators visible.
+
+Hidden does not renumber source mappings, alter inversion or change the Enabled setting. Unhide and redeploy to restore the same indicator. It also does not change the input contract: arrays still require the full configured length and named objects still require all configured keys, including hidden ones. This is an editor setting applied on redeploy, not a message-driven visibility rule. All indicators may be hidden, but the containing Dashboard widget/group allocation remains; Hidden removes individual LED cells. No DOM elements or paint operations are created for hidden LEDs.
 
 The visual Label / LED layout picker offers four choices: label then LED or LED then label, either together or at opposite edges of each cell. Existing flows default to LED then label together. This setting is separate from the grid/column/row arrangement.
 
