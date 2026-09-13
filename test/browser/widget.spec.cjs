@@ -58,6 +58,7 @@ test('per-LED overrides, theme variables and stable DOM updates', async ({ page,
 })
 
 test('Node-RED editor exposes per-LED fields without JSON editing', async ({ page }) => {
+    await page.addLocatorHandler(page.getByRole('button', { name: 'No, do not enable notifications', exact: true }), button => button.click())
     await page.goto('/red/')
     await page.waitForFunction(() => window.RED?.nodes?.node('led-uint32'))
     await page.evaluate(() => RED.editor.edit(RED.nodes.node('led-uint32')))
@@ -69,4 +70,31 @@ test('Node-RED editor exposes per-LED fields without JSON editing', async ({ pag
     await expect(page.locator('.bit-led-editor-row')).toHaveCount(8)
     await expect(first.locator('.led-label')).toHaveValue('Motor running')
     await expect(first.locator('.led-inverted')).toHaveValue('true')
+    await page.getByRole('radio', { name: 'Label left, LED right', exact: true }).check()
+    await page.locator('#node-dialog-ok').click()
+    await expect(page.locator('.bit-led-layout-options')).toHaveCount(0)
+    await page.evaluate(() => RED.editor.edit(RED.nodes.node('led-uint32')))
+    await expect(page.getByRole('radio', { name: 'Label left, LED right', exact: true })).toBeChecked()
+    await page.locator('.bit-led-layout-options').screenshot({ path: 'test-results/layout-picker.png' })
+})
+
+test('four label layouts use the expected edges and default on/off colors', async ({ page, request }) => {
+    await page.goto('/ui/signals')
+    for (const mode of ['label-led', 'led-label', 'label-led-spread', 'led-label-spread']) {
+        const list = page.getByRole('list', { name: mode, exact: true })
+        const lamp = list.locator('.bit-led-lamp')
+        await request.post(`/test/input/layout-${mode}`, { data: { payload: true } })
+        await expect(lamp).toHaveCSS('background-color', 'rgb(0, 200, 83)')
+        await expect(lamp).not.toHaveCSS('filter', 'none')
+        const ledBox = await lamp.boundingBox()
+        const labelBox = await list.locator('.bit-led-label').boundingBox()
+        const labelFirst = mode.startsWith('label-')
+        expect(labelFirst ? labelBox.x < ledBox.x : ledBox.x < labelBox.x).toBe(true)
+        const gap = labelFirst ? ledBox.x - labelBox.x - labelBox.width : labelBox.x - ledBox.x - ledBox.width
+        if (mode.endsWith('spread')) expect(gap).toBeGreaterThan(30)
+        else expect(gap).toBeCloseTo(9, 0)
+        await request.post(`/test/input/layout-${mode}`, { data: { payload: false } })
+        await expect(lamp).toHaveCSS('background-color', 'rgb(168, 181, 172)')
+        await expect(lamp).toHaveCSS('filter', 'none')
+    }
 })

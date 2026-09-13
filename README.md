@@ -2,7 +2,7 @@
 
 One Node-RED input displays 1, 8, 16 or 32 boolean signals in a FlowFuse Dashboard 2 widget. This is a read-only status display with no outputs, control commands or device-specific logic.
 
-**Prerelease: 0.1.0-beta.2.** Target-device performance acceptance remains pending.
+**Prerelease: 0.1.0-beta.3.** Target-device performance acceptance remains pending.
 
 The GitHub repository is `oleru/node-red-contrib-dashboard2-bit-led`; the installable package is **`node-red-dashboard-2-bit-led`**. Dashboard 1.31 discovers third-party packages by the `node-red-dashboard-2-` name fragment, so the suggested repository name cannot also be the package name.
 
@@ -14,7 +14,7 @@ Download the `.tgz` from the GitHub prerelease, then run in your Node-RED user d
 
 ```sh
 npm install @flowfuse/node-red-dashboard@1.31.0
-npm install /path/to/node-red-dashboard-2-bit-led-0.1.0-beta.2.tgz
+npm install /path/to/node-red-dashboard-2-bit-led-0.1.0-beta.3.tgz
 ```
 
 Restart Node-RED. Add **bit LEDs** from the dashboard palette, choose a Dashboard 2 group and explicitly select the input type. Import `examples/dashboard2-bit-led-flow.json` for examples of all input types. Inject nodes do not run automatically.
@@ -22,7 +22,7 @@ Restart Node-RED. Add **bit LEDs** from the dashboard palette, choose a Dashboar
 For installation from a versioned Git tag (requires the development build dependencies during installation):
 
 ```sh
-npm install github:oleru/node-red-contrib-dashboard2-bit-led#v0.1.0-beta.2
+npm install github:oleru/node-red-contrib-dashboard2-bit-led#v0.1.0-beta.3
 ```
 
 The tarball includes the compiled browser bundle; no build is needed on the target machine. Keep the tarball available for reproducible installation or use the exact tag. Do not track a moving development branch.
@@ -48,7 +48,9 @@ Invalid input retains the latest valid value, sets red Node-RED status and logs 
 
 Each LED has a source, label, enabled flag, inherited/normal/inverted logic, optional active/inactive colors and optional Material Design icon (e.g. `mdi-alert`). Per-LED choices override shared defaults. Disabled means visible and dimmed, independent of the payload. Inversion happens before active/inactive color selection.
 
-Shared settings include default inversion, active/inactive/disabled colors, one-column/grid/wrapping-row layout and grid column count. Blank colors use Dashboard theme CSS variables. CSS colors and `var(--your-variable)` are supported. Grid layout reduces to at most two columns on narrow screens. Waiting LEDs use the disabled color and have an accessible “Waiting for data” label until the first valid input. State is exposed in accessible text as well as color.
+The visual Label / LED layout picker offers four choices: label then LED or LED then label, either together or at opposite edges of each cell. Existing flows default to LED then label together. This setting is separate from the grid/column/row arrangement.
+
+Shared settings include default inversion, active/inactive/disabled colors, one-column/grid/wrapping-row layout and grid column count. Blank active/inactive colors use vivid green (#00c853) and green-grey (#a8b5ac). Active LEDs and icons have a subtle steady glow following their active color. Disabled color uses a Dashboard theme variable. CSS colors and `var(--your-variable)` are supported. Grid layout reduces to at most two columns on narrow screens. Waiting LEDs use the disabled color and have an accessible “Waiting for data” label until the first valid input. State is exposed in accessible text as well as color.
 
 Changing input type resets source mappings while retaining labels and visual overrides. Configuration is static until redeploy; `msg.ui_update`, client targeting and interactive actions are intentionally unsupported.
 

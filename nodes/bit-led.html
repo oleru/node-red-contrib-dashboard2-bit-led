@@ -9,12 +9,17 @@
             order: { value: 0 }, width: { value: 0 }, height: { value: 0 },
             inputType: { value: 'uint8', required: true }, count: { value: 8, required: true },
             layout: { value: 'grid' }, columns: { value: 4, validate: RED.validators.number() },
+            labelLayout: { value: 'led-label' },
             inverted: { value: false }, activeColor: { value: '' }, passiveColor: { value: '' },
             disabledColor: { value: '' }, diagnostics: { value: false },
             indicators: { value: [] }
         },
         oneditprepare: function () {
             const node = this
+            $('#node-input-labelLayout').val(node.labelLayout || 'led-label')
+            $('input[name="bit-led-label-layout"]').val([node.labelLayout || 'led-label']).on('change', function () {
+                $('#node-input-labelLayout').val(this.value)
+            })
             let rows = (node.indicators || []).map(function (row) { return Object.assign({}, row) })
             function readRows () {
                 $('#bit-led-indicators .bit-led-editor-row').each(function (i) {
@@ -76,6 +81,12 @@
     .bit-led-editor-row { border: 1px solid #aaa; padding: 8px; margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .bit-led-editor-row label { display: block; width: auto !important; font-size: 12px; }
     .bit-led-editor-row input[type=text], .bit-led-editor-row select { display: block; width: 100%; }
+    .bit-led-layout-options { display: inline-grid; grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 12px; width: 70%; }
+    .bit-led-layout-options label { position: relative; display: flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; width: auto !important; min-height: 80px; padding: 12px; border: 1px solid var(--red-ui-form-input-border-color, #aaa); border-radius: 4px; cursor: pointer; }
+    .bit-led-layout-options label:has(input:checked) { border: 2px solid var(--red-ui-form-input-border-selected-color, #00897b); }
+    .bit-led-layout-options input { position: absolute; right: 4px; top: 4px; width: auto !important; margin: 0; }
+    .bit-led-layout-options .bit-led-layout-spread { justify-content: space-between; }
+    .bit-led-layout-options b { width: 18px; height: 18px; border-radius: 50%; background: #00c853; flex-shrink: 0; }
 </style>
 <script type="text/html" data-template-name="ui-bit-led">
     <div class="form-row"><label for="node-input-name">Name</label><input id="node-input-name" type="text"></div>
@@ -85,11 +96,19 @@
     <div class="form-row"><label for="node-input-height">Height</label><input id="node-input-height" type="number" min="0"><span> 0 = automatic</span></div>
     <div class="form-row"><label for="node-input-inputType">Input type</label><select id="node-input-inputType"><option value="boolean">Boolean</option><option value="uint8">UInt8</option><option value="uint16">UInt16</option><option value="uint32">UInt32</option><option value="array">Boolean array</option><option value="object">Named object</option></select></div>
     <div class="form-row"><label for="node-input-count">LED count</label><select id="node-input-count"><option>1</option><option>8</option><option>16</option><option>32</option></select></div>
-    <div class="form-row"><label for="node-input-layout">Layout</label><select id="node-input-layout"><option value="column">One column</option><option value="grid">Multiple columns</option><option value="row">Horizontal, wrapping</option></select></div>
+    <div class="form-row"><label for="node-input-layout">LED arrangement</label><select id="node-input-layout"><option value="column">One column</option><option value="grid">Multiple columns</option><option value="row">Horizontal, wrapping</option></select></div>
+    <div class="form-row"><label>Label / LED layout</label><input id="node-input-labelLayout" type="hidden">
+        <div class="bit-led-layout-options" role="radiogroup" aria-label="Label / LED layout">
+            <label><input type="radio" name="bit-led-label-layout" value="label-led" aria-label="Label then LED, together"><span>label</span><b aria-hidden="true"></b></label>
+            <label><input type="radio" name="bit-led-label-layout" value="led-label" aria-label="LED then label, together"><b aria-hidden="true"></b><span>label</span></label>
+            <label class="bit-led-layout-spread"><input type="radio" name="bit-led-label-layout" value="label-led-spread" aria-label="Label left, LED right"><span>label</span><b aria-hidden="true"></b></label>
+            <label class="bit-led-layout-spread"><input type="radio" name="bit-led-label-layout" value="led-label-spread" aria-label="LED left, label right"><b aria-hidden="true"></b><span>label</span></label>
+        </div>
+    </div>
     <div class="form-row"><label for="node-input-columns">Columns</label><input id="node-input-columns" type="number" min="1" max="32"></div>
     <div class="form-row"><label for="node-input-inverted">Invert default</label><input id="node-input-inverted" type="checkbox" style="width:auto"></div>
-    <div class="form-row"><label for="node-input-activeColor">Active color</label><input id="node-input-activeColor" placeholder="Theme primary"></div>
-    <div class="form-row"><label for="node-input-passiveColor">Inactive color</label><input id="node-input-passiveColor" placeholder="Theme foreground, 22%"></div>
+    <div class="form-row"><label for="node-input-activeColor">Active color</label><input id="node-input-activeColor" placeholder="#00c853 — green"></div>
+    <div class="form-row"><label for="node-input-passiveColor">Inactive color</label><input id="node-input-passiveColor" placeholder="#a8b5ac — green-grey"></div>
     <div class="form-row"><label for="node-input-disabledColor">Disabled color</label><input id="node-input-disabledColor" placeholder="Theme foreground, 12%"></div>
     <div class="form-row"><label for="node-input-diagnostics">Diagnostics</label><input id="node-input-diagnostics" type="checkbox" style="width:auto"></div>
     <p>Colors accept CSS colors and CSS variables. Blank values inherit defaults. Disabled LEDs remain visible.</p>
@@ -99,5 +118,6 @@
     <p>Displays 1, 8, 16 or 32 status LEDs on FlowFuse Dashboard 2. One input, no outputs.</p>
     <p>Send the explicitly selected type in <code>msg.payload</code>. Unsigned integers must be within their bit width; bit 0 is the least significant bit. Boolean requires one LED. Arrays require exactly the LED count and boolean entries. Named objects require every configured literal key to contain a boolean; extra keys are ignored. Disabled sources are still validated.</p>
     <p>Individual logic and colors override shared defaults. Invalid input retains the last valid display and sets red node status. Warnings are limited to one per five seconds. Refresh/reconnect restores the last valid value while Node-RED is running.</p>
+    <p>Label / LED layout places the label before or after the LED, either together or at opposite edges of each indicator cell. LED arrangement controls the grid/column/row separately. Default colors are green (#00c853) for active and green-grey (#a8b5ac) for inactive; custom colors and CSS variables override these.</p>
     <p>Changing input type resets source mappings; labels and overrides remain. Redeploy after configuration changes. Diagnostics show session totals and average browser rates; rejected payload counts are reported by the runtime warning.</p>
 </script>
