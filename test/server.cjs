@@ -11,7 +11,7 @@ fs.writeFileSync(path.join(userDir, 'package.json'), JSON.stringify({ name: 'bit
 const app = express()
 const server = http.createServer(app)
 RED.init(server, {
-    userDir, nodesDir: process.env.BIT_LED_PACKAGE || root, flowFile: path.join(userDir, 'flows.json'),
+    userDir, nodesDir: process.env.BIT_LED_PACKAGE ? path.resolve(process.env.BIT_LED_PACKAGE) : root, flowFile: path.join(userDir, 'flows.json'),
     uiPort: 18890, httpAdminRoot: '/red', httpNodeRoot: '/',
     logging: { console: { level: 'warn' } }, editorTheme: { projects: { enabled: false } }
 })
