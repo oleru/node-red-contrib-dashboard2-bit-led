@@ -1,12 +1,32 @@
 {
   "name": "node-red-dashboard-2-bit-led",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "description": "Compact boolean and unsigned bitfield LED indicators for FlowFuse Dashboard 2",
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/oleru/node-red-contrib-dashboard2-bit-led.git" },
-  "keywords": ["node-red", "node-red-dashboard-2", "dashboard", "led", "bitfield"],
-  "engines": { "node": ">=22.12.0" },
-  "files": ["nodes", "lib", "resources", "examples", "docs", "README.md", "CHANGELOG.md", "LICENSE"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oleru/node-red-contrib-dashboard2-bit-led.git"
+  },
+  "keywords": [
+    "node-red",
+    "node-red-dashboard-2",
+    "dashboard",
+    "led",
+    "bitfield"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "files": [
+    "nodes",
+    "lib",
+    "resources",
+    "examples",
+    "docs",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "vite build",
     "test": "node --test test/*.test.cjs",
@@ -15,12 +35,24 @@
     "prepare": "npm run build",
     "prepack": "npm test && npm run build"
   },
-  "node-red": { "version": ">=4.0.0", "nodes": { "ui-bit-led": "nodes/bit-led.js" } },
+  "node-red": {
+    "version": ">=4.0.0",
+    "nodes": {
+      "ui-bit-led": "nodes/bit-led.js"
+    }
+  },
   "node-red-dashboard-2": {
     "version": "1.31.0",
-    "widgets": { "ui-bit-led": { "output": "ui-bit-led.umd.js", "component": "BitLed" } }
+    "widgets": {
+      "ui-bit-led": {
+        "output": "ui-bit-led.umd.js",
+        "component": "BitLed"
+      }
+    }
   },
-  "peerDependencies": { "@flowfuse/node-red-dashboard": ">=1.31.0 <2" },
+  "peerDependencies": {
+    "@flowfuse/node-red-dashboard": ">=1.31.0 <2"
+  },
   "devDependencies": {
     "@flowfuse/node-red-dashboard": "1.31.0",
     "@vitejs/plugin-vue": "6.0.8",

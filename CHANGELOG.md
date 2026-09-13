@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-beta.2 — 2026-09-13
+
+- Resolve the packaged test node path before starting Node-RED, supporting Linux CI as well as Windows.
+- First downloadable prerelease; beta.1 remains an initial development tag.
+
 ## 0.1.0-beta.1 — 2026-09-13
 
 - Initial read-only Dashboard 2 widget with 1/8/16/32 LEDs.
