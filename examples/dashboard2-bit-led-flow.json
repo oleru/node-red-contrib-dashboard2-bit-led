@@ -1,0 +1,386 @@
+[
+  {
+    "id": "led-flow",
+    "type": "tab",
+    "label": "Bit LED examples"
+  },
+  {
+    "id": "led-base",
+    "type": "ui-base",
+    "name": "Bit LED demo",
+    "path": "/ui",
+    "includeClientData": true,
+    "acceptsClientConfig": [],
+    "showPathInSidebar": false,
+    "navigationStyle": "default",
+    "titleBarStyle": "default"
+  },
+  {
+    "id": "led-theme",
+    "type": "ui-theme",
+    "name": "Default",
+    "colors": {
+      "surface": "#ffffff",
+      "primary": "#00897b",
+      "bgPage": "#f1f5f9",
+      "groupBg": "#ffffff",
+      "groupOutline": "#cbd5e1"
+    },
+    "sizes": {
+      "density": "default",
+      "pagePadding": "12px",
+      "groupGap": "12px",
+      "groupBorderRadius": "8px",
+      "widgetGap": "12px"
+    }
+  },
+  {
+    "id": "led-page",
+    "type": "ui-page",
+    "name": "Signals",
+    "ui": "led-base",
+    "path": "/signals",
+    "icon": "mdi-led-on",
+    "layout": "grid",
+    "theme": "led-theme",
+    "order": 1,
+    "breakpoints": [
+      {
+        "name": "Default",
+        "px": "0",
+        "cols": "3"
+      },
+      {
+        "name": "Tablet",
+        "px": "576",
+        "cols": "6"
+      },
+      {
+        "name": "Desktop",
+        "px": "1024",
+        "cols": "12"
+      }
+    ]
+  },
+  {
+    "id": "other-page",
+    "type": "ui-page",
+    "name": "Other page",
+    "ui": "led-base",
+    "path": "/other",
+    "icon": "mdi-home",
+    "layout": "grid",
+    "theme": "led-theme",
+    "order": 2
+  },
+  {
+    "id": "led-group",
+    "type": "ui-group",
+    "name": "Status signals",
+    "page": "led-page",
+    "width": "12",
+    "height": "1",
+    "order": 1,
+    "showTitle": true,
+    "groupType": "default"
+  },
+  {
+    "id": "led-boolean",
+    "type": "ui-bit-led",
+    "z": "led-flow",
+    "name": "boolean",
+    "group": "led-group",
+    "order": 0,
+    "width": 6,
+    "height": 0,
+    "inputType": "boolean",
+    "count": 1,
+    "columns": 4,
+    "layout": "grid",
+    "indicators": [],
+    "x": 520,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "inject-boolean",
+    "type": "inject",
+    "z": "led-flow",
+    "name": "Send boolean",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "true",
+    "payloadType": "json",
+    "repeat": "",
+    "once": false,
+    "x": 210,
+    "y": 80,
+    "wires": [
+      [
+        "led-boolean"
+      ]
+    ]
+  },
+  {
+    "id": "led-uint8",
+    "type": "ui-bit-led",
+    "z": "led-flow",
+    "name": "uint8",
+    "group": "led-group",
+    "order": 1,
+    "width": 6,
+    "height": 0,
+    "inputType": "uint8",
+    "count": 8,
+    "columns": 4,
+    "layout": "grid",
+    "indicators": [
+      {
+        "label": "Bit 0"
+      },
+      {
+        "label": "Inverted",
+        "inverted": true
+      },
+      {
+        "label": "Disabled",
+        "enabled": false
+      },
+      {
+        "label": "Red override",
+        "activeColor": "#ff0000"
+      }
+    ],
+    "x": 520,
+    "y": 150,
+    "wires": []
+  },
+  {
+    "id": "inject-uint8",
+    "type": "inject",
+    "z": "led-flow",
+    "name": "Send uint8",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "129",
+    "payloadType": "json",
+    "repeat": "",
+    "once": false,
+    "x": 210,
+    "y": 150,
+    "wires": [
+      [
+        "led-uint8"
+      ]
+    ]
+  },
+  {
+    "id": "led-uint16",
+    "type": "ui-bit-led",
+    "z": "led-flow",
+    "name": "uint16",
+    "group": "led-group",
+    "order": 2,
+    "width": 6,
+    "height": 0,
+    "inputType": "uint16",
+    "count": 16,
+    "columns": 4,
+    "layout": "grid",
+    "indicators": [],
+    "x": 520,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "inject-uint16",
+    "type": "inject",
+    "z": "led-flow",
+    "name": "Send uint16",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "32769",
+    "payloadType": "json",
+    "repeat": "",
+    "once": false,
+    "x": 210,
+    "y": 220,
+    "wires": [
+      [
+        "led-uint16"
+      ]
+    ]
+  },
+  {
+    "id": "led-uint32",
+    "type": "ui-bit-led",
+    "z": "led-flow",
+    "name": "uint32",
+    "group": "led-group",
+    "order": 3,
+    "width": 6,
+    "height": 0,
+    "inputType": "uint32",
+    "count": 32,
+    "columns": 4,
+    "layout": "grid",
+    "indicators": [],
+    "x": 520,
+    "y": 290,
+    "wires": []
+  },
+  {
+    "id": "inject-uint32",
+    "type": "inject",
+    "z": "led-flow",
+    "name": "Send uint32",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "2147483649",
+    "payloadType": "json",
+    "repeat": "",
+    "once": false,
+    "x": 210,
+    "y": 290,
+    "wires": [
+      [
+        "led-uint32"
+      ]
+    ]
+  },
+  {
+    "id": "led-array",
+    "type": "ui-bit-led",
+    "z": "led-flow",
+    "name": "array",
+    "group": "led-group",
+    "order": 4,
+    "width": 6,
+    "height": 0,
+    "inputType": "array",
+    "count": 8,
+    "columns": 4,
+    "layout": "grid",
+    "indicators": [],
+    "x": 520,
+    "y": 360,
+    "wires": []
+  },
+  {
+    "id": "inject-array",
+    "type": "inject",
+    "z": "led-flow",
+    "name": "Send array",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "[true,false,true,false,true,false,true,false]",
+    "payloadType": "json",
+    "repeat": "",
+    "once": false,
+    "x": 210,
+    "y": 360,
+    "wires": [
+      [
+        "led-array"
+      ]
+    ]
+  },
+  {
+    "id": "led-object",
+    "type": "ui-bit-led",
+    "z": "led-flow",
+    "name": "object",
+    "group": "led-group",
+    "order": 5,
+    "width": 6,
+    "height": 0,
+    "inputType": "object",
+    "count": 1,
+    "columns": 4,
+    "layout": "grid",
+    "indicators": [
+      {
+        "source": "Ready",
+        "label": "Ready",
+        "icon": "mdi-check-circle"
+      }
+    ],
+    "x": 520,
+    "y": 430,
+    "wires": []
+  },
+  {
+    "id": "inject-object",
+    "type": "inject",
+    "z": "led-flow",
+    "name": "Send object",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "{\"Ready\":true}",
+    "payloadType": "json",
+    "repeat": "",
+    "once": false,
+    "x": 210,
+    "y": 430,
+    "wires": [
+      [
+        "led-object"
+      ]
+    ]
+  },
+  {
+    "id": "inject-10hz",
+    "type": "inject",
+    "z": "led-flow",
+    "name": "10 Hz synthetic (set repeat to 0.1s)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "payload": "0",
+    "payloadType": "num",
+    "repeat": "",
+    "once": false,
+    "x": 220,
+    "y": 550,
+    "wires": [
+      [
+        "pattern-all-bits"
+      ]
+    ]
+  },
+  {
+    "id": "pattern-all-bits",
+    "type": "function",
+    "z": "led-flow",
+    "name": "Toggle all 32 bits",
+    "func": "const active = !context.get(\"active\");\ncontext.set(\"active\", active);\nreturn { payload: active ? 4294967295 : 0 };",
+    "outputs": 1,
+    "x": 510,
+    "y": 550,
+    "wires": [
+      [
+        "led-uint32"
+      ]
+    ]
+  }
+]

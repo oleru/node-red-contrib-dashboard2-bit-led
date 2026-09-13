@@ -1,0 +1,103 @@
+<script type="text/javascript">
+(function () {
+    RED.nodes.registerType('ui-bit-led', {
+        category: 'dashboard', color: '#4db6ac', icon: 'font-awesome/fa-circle',
+        inputs: 1, outputs: 0, paletteLabel: 'bit LEDs',
+        label: function () { return this.name || 'bit LEDs' },
+        defaults: {
+            name: { value: '' }, group: { type: 'ui-group', required: true },
+            order: { value: 0 }, width: { value: 0 }, height: { value: 0 },
+            inputType: { value: 'uint8', required: true }, count: { value: 8, required: true },
+            layout: { value: 'grid' }, columns: { value: 4, validate: RED.validators.number() },
+            inverted: { value: false }, activeColor: { value: '' }, passiveColor: { value: '' },
+            disabledColor: { value: '' }, diagnostics: { value: false },
+            indicators: { value: [] }
+        },
+        oneditprepare: function () {
+            const node = this
+            let rows = (node.indicators || []).map(function (row) { return Object.assign({}, row) })
+            function readRows () {
+                $('#bit-led-indicators .bit-led-editor-row').each(function (i) {
+                    const row = $(this)
+                    const inverted = row.find('.led-inverted').val()
+                    rows[i] = {
+                        source: $('#node-input-inputType').val() === 'object' ? row.find('.led-source').val() : Number(row.find('.led-source').val()),
+                        label: row.find('.led-label').val(), enabled: row.find('.led-enabled').prop('checked'),
+                        inverted: inverted === 'inherit' ? null : inverted === 'true',
+                        activeColor: row.find('.led-activeColor').val(), passiveColor: row.find('.led-passiveColor').val(),
+                        icon: row.find('.led-icon').val()
+                    }
+                })
+            }
+            function renderRows () {
+                const type = $('#node-input-inputType').val()
+                const count = Number($('#node-input-count').val())
+                const container = $('#bit-led-indicators').empty()
+                for (let i = 0; i < count; i++) {
+                    const item = rows[i] || {}
+                    const row = $('<fieldset class="bit-led-editor-row">').appendTo(container)
+                    $('<legend>').text('LED ' + (i + 1)).appendTo(row)
+                    function field (key, title, value) {
+                        const label = $('<label>').text(title).appendTo(row)
+                        return $('<input type="text">').addClass('led-' + key).val(value).appendTo(label)
+                    }
+                    const source = item.source === undefined ? (type === 'object' ? 'bit' + i : i) : item.source
+                    field('source', type === 'object' ? 'Input key (literal)' : 'Bit / index (zero-based)', source)
+                    field('label', 'Label', item.label === undefined ? 'Bit ' + i : item.label)
+                    const logicLabel = $('<label>').text('Logic').appendTo(row)
+                    $('<select class="led-inverted"><option value="inherit">Use default</option><option value="false">Normal</option><option value="true">Inverted</option></select>')
+                        .val(typeof item.inverted === 'boolean' ? String(item.inverted) : 'inherit').appendTo(logicLabel)
+                    const enabled = $('<label>').text('Enabled ').appendTo(row)
+                    $('<input type="checkbox" class="led-enabled">').prop('checked', item.enabled !== false).appendTo(enabled)
+                    field('activeColor', 'Active color (blank = default)', item.activeColor || '')
+                    field('passiveColor', 'Inactive color (blank = default)', item.passiveColor || '')
+                    field('icon', 'Optional MDI icon, e.g. mdi-alert', item.icon || '')
+                }
+            }
+            $('#node-input-count').on('change.bitLed', function () { readRows(); renderRows() })
+            $('#node-input-inputType').on('change.bitLed', function () {
+                readRows()
+                const type = $(this).val()
+                const suggested = { boolean: 1, uint8: 8, uint16: 16, uint32: 32 }
+                if (suggested[type]) $('#node-input-count').val(String(suggested[type]))
+                rows.forEach(function (row, i) { row.source = type === 'object' ? 'bit' + i : i })
+                renderRows()
+            })
+            node._bitLedRead = function () { readRows(); return rows.slice(0, Number($('#node-input-count').val())) }
+            renderRows()
+        },
+        oneditsave: function () { this.indicators = this._bitLedRead(); delete this._bitLedRead },
+        oneditcancel: function () { delete this._bitLedRead }
+    })
+})()
+</script>
+<style>
+    #bit-led-indicators { max-height: 430px; overflow-y: auto; }
+    .bit-led-editor-row { border: 1px solid #aaa; padding: 8px; margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .bit-led-editor-row label { display: block; width: auto !important; font-size: 12px; }
+    .bit-led-editor-row input[type=text], .bit-led-editor-row select { display: block; width: 100%; }
+</style>
+<script type="text/html" data-template-name="ui-bit-led">
+    <div class="form-row"><label for="node-input-name">Name</label><input id="node-input-name" type="text"></div>
+    <div class="form-row"><label for="node-input-group">Group</label><input id="node-input-group"></div>
+    <div class="form-row"><label for="node-input-order">Order</label><input id="node-input-order" type="number" min="0"></div>
+    <div class="form-row"><label for="node-input-width">Width</label><input id="node-input-width" type="number" min="0"><span> 0 = group width</span></div>
+    <div class="form-row"><label for="node-input-height">Height</label><input id="node-input-height" type="number" min="0"><span> 0 = automatic</span></div>
+    <div class="form-row"><label for="node-input-inputType">Input type</label><select id="node-input-inputType"><option value="boolean">Boolean</option><option value="uint8">UInt8</option><option value="uint16">UInt16</option><option value="uint32">UInt32</option><option value="array">Boolean array</option><option value="object">Named object</option></select></div>
+    <div class="form-row"><label for="node-input-count">LED count</label><select id="node-input-count"><option>1</option><option>8</option><option>16</option><option>32</option></select></div>
+    <div class="form-row"><label for="node-input-layout">Layout</label><select id="node-input-layout"><option value="column">One column</option><option value="grid">Multiple columns</option><option value="row">Horizontal, wrapping</option></select></div>
+    <div class="form-row"><label for="node-input-columns">Columns</label><input id="node-input-columns" type="number" min="1" max="32"></div>
+    <div class="form-row"><label for="node-input-inverted">Invert default</label><input id="node-input-inverted" type="checkbox" style="width:auto"></div>
+    <div class="form-row"><label for="node-input-activeColor">Active color</label><input id="node-input-activeColor" placeholder="Theme primary"></div>
+    <div class="form-row"><label for="node-input-passiveColor">Inactive color</label><input id="node-input-passiveColor" placeholder="Theme foreground, 22%"></div>
+    <div class="form-row"><label for="node-input-disabledColor">Disabled color</label><input id="node-input-disabledColor" placeholder="Theme foreground, 12%"></div>
+    <div class="form-row"><label for="node-input-diagnostics">Diagnostics</label><input id="node-input-diagnostics" type="checkbox" style="width:auto"></div>
+    <p>Colors accept CSS colors and CSS variables. Blank values inherit defaults. Disabled LEDs remain visible.</p>
+    <div id="bit-led-indicators"></div>
+</script>
+<script type="text/html" data-help-name="ui-bit-led">
+    <p>Displays 1, 8, 16 or 32 status LEDs on FlowFuse Dashboard 2. One input, no outputs.</p>
+    <p>Send the explicitly selected type in <code>msg.payload</code>. Unsigned integers must be within their bit width; bit 0 is the least significant bit. Boolean requires one LED. Arrays require exactly the LED count and boolean entries. Named objects require every configured literal key to contain a boolean; extra keys are ignored. Disabled sources are still validated.</p>
+    <p>Individual logic and colors override shared defaults. Invalid input retains the last valid display and sets red node status. Warnings are limited to one per five seconds. Refresh/reconnect restores the last valid value while Node-RED is running.</p>
+    <p>Changing input type resets source mappings; labels and overrides remain. Redeploy after configuration changes. Diagnostics show session totals and average browser rates; rejected payload counts are reported by the runtime warning.</p>
+</script>

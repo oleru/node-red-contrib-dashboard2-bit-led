@@ -1,0 +1,6 @@
+const { defineConfig } = require('@playwright/test')
+module.exports = defineConfig({
+    testDir: './test/browser', workers: 1, timeout: 45000, globalTeardown: './test/teardown.cjs',
+    use: { baseURL: 'http://127.0.0.1:18890', browserName: 'chromium', headless: true },
+    webServer: { command: 'node test/server.cjs', url: 'http://127.0.0.1:18890/test/ready', reuseExistingServer: false, timeout: 60000 }
+})

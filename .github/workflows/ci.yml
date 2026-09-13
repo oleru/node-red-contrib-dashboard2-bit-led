@@ -1,0 +1,29 @@
+name: Build and test
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm pack
+      - run: npx playwright install --with-deps chromium
+      - run: mkdir -p .test-runtime && tar -xzf node-red-dashboard-2-bit-led-*.tgz -C .test-runtime
+      - run: npm run test:browser
+        env:
+          BIT_LED_PACKAGE: .test-runtime/package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bit-led-node-${{ matrix.node }}
+          path: '*.tgz'

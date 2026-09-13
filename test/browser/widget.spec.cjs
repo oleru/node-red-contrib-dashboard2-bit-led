@@ -1,0 +1,72 @@
+const { test, expect } = require('@playwright/test')
+
+test('real Dashboard: all types, bit 31, invalid hold, reload, navigation, narrow layout', async ({ page, request }) => {
+    const errors = []
+    page.on('pageerror', error => errors.push(error.message))
+    await page.goto('/ui/signals')
+    const lamps = name => page.getByRole('list', { name, exact: true }).locator('.bit-led-lamp')
+    for (const [type, count, payload] of [['boolean', 1, true], ['uint8', 8, 129], ['uint16', 16, 32769], ['uint32', 32, 2147483649], ['array', 8, Array(8).fill(true)], ['object', 1, { Ready: true }]]) {
+        await expect(lamps(type)).toHaveCount(count)
+        await request.post(`/test/input/led-${type}`, { data: { payload } })
+        await expect(lamps(type).first()).toHaveAttribute('data-state', 'active')
+        await expect(lamps(type).last()).toHaveAttribute('data-state', 'active')
+    }
+    await request.post('/test/input/led-uint32', { data: { payload: -1 } })
+    await page.reload()
+    await expect(lamps('uint32').last()).toHaveAttribute('data-state', 'active')
+    await expect(lamps('uint32').nth(1)).toHaveAttribute('data-state', 'inactive')
+    await page.goto('/ui/other')
+    await page.goto('/ui/signals')
+    await expect(lamps('uint32').last()).toHaveAttribute('data-state', 'active')
+    await page.setViewportSize({ width: 375, height: 812 })
+    await expect(lamps('uint32')).toHaveCount(32)
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+    expect(errors).toEqual([])
+    await page.setViewportSize({ width: 1280, height: 1000 })
+    await page.screenshot({ path: 'test-results/dashboard.png', fullPage: true })
+})
+
+test('10 Hz for 10 seconds reaches final value; reconnect restores latest', async ({ page, request, context }) => {
+    await page.goto('/ui/signals')
+    const leds = page.getByRole('list', { name: 'uint32', exact: true }).locator('.bit-led-lamp')
+    await expect(leds).toHaveCount(32)
+    for (let i = 0; i < 100; i++) {
+        await request.post('/test/input/led-uint32', { data: { payload: i % 2 ? 4294967295 : 0 } })
+        await new Promise(resolve => setTimeout(resolve, 100))
+    }
+    await expect(leds.last()).toHaveAttribute('data-state', 'active')
+    await context.setOffline(true)
+    await request.post('/test/input/led-uint32', { data: { payload: 0 } })
+    await context.setOffline(false)
+    await expect(leds.last()).toHaveAttribute('data-state', 'inactive', { timeout: 15000 })
+})
+
+test('per-LED overrides, theme variables and stable DOM updates', async ({ page, request }) => {
+    await page.goto('/ui/signals')
+    const list = page.getByRole('list', { name: 'uint8', exact: true })
+    const leds = list.locator('.bit-led-lamp')
+    await expect(leds).toHaveCount(8)
+    await request.post('/test/input/led-uint8', { data: { payload: 8 } })
+    await expect(leds.nth(1)).toHaveAttribute('data-state', 'active')
+    await expect(leds.nth(2)).toHaveAttribute('data-state', 'disabled')
+    await expect(leds.nth(3)).toHaveCSS('background-color', 'rgb(255, 0, 0)')
+    await list.evaluate(el => { el.style.setProperty('--v-theme-primary', '0, 0, 255'); window.originalLamp = el.querySelector('.bit-led-lamp') })
+    await expect(leds.nth(1)).toHaveCSS('background-color', 'rgb(0, 0, 255)')
+    await request.post('/test/input/led-uint8', { data: { payload: 9 } })
+    await expect(leds.first()).toHaveAttribute('data-state', 'active')
+    expect(await leds.first().evaluate(el => el === window.originalLamp)).toBe(true)
+})
+
+test('Node-RED editor exposes per-LED fields without JSON editing', async ({ page }) => {
+    await page.goto('/red/')
+    await page.waitForFunction(() => window.RED?.nodes?.node('led-uint32'))
+    await page.evaluate(() => RED.editor.edit(RED.nodes.node('led-uint32')))
+    await expect(page.locator('.bit-led-editor-row')).toHaveCount(32)
+    const first = page.locator('.bit-led-editor-row').first()
+    await first.locator('.led-label').fill('Motor running')
+    await first.locator('.led-inverted').selectOption('true')
+    await page.locator('#node-input-count').selectOption('8')
+    await expect(page.locator('.bit-led-editor-row')).toHaveCount(8)
+    await expect(first.locator('.led-label')).toHaveValue('Motor running')
+    await expect(first.locator('.led-inverted')).toHaveValue('true')
+})
